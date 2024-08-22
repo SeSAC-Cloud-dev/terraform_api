@@ -1,40 +1,38 @@
 import os
-import json
-from fastapi import APIRouter, Body
+from pydantic import BaseModel
+from fastapi import APIRouter
 from function.hcl import create_hcl, terraform_apply, terraform_destroy
 
-router = APIRouter(prefix="/hcl", tags=["hcl"])
+router = APIRouter(prefix="/terraform", tags=["hcl"])
 
-
-@router.post("/apply", status_code=201)
+class User(BaseModel):
+    user_id: str
+    seq: str
+    ami_id: str
+    instance_type: str
+    subnet_id: str
+    tag_name: str
+    
+class DeleteUser(BaseModel):
+    user_id: str
+    seq: str
+    
+@router.post("/", status_code=201)
 async def create_vd(
-    user_id: str,
-    seq: str,
-    ami_id: str,
-    instance_type: str,
-    subnet_id: str,
-    tag_name: str,
+    user_config:User
 ) -> dict:
-    user_config = {
-        "user_id": user_id,
-        "seq": seq,
-        "ami_id": ami_id,
-        "instance_type": instance_type,
-        "subnet_id": subnet_id,
-        "tag_name": tag_name,
-    }
-
-    output_path = create_hcl(user_config)  # hcl 생성
+    user_config_dict = user_config.dict()
+    output_path = create_hcl(user_config_dict)  # hcl 생성
     output_message = terraform_apply(output_path)
 
     return {"message": output_message}
 
 
-@router.delete("/destroy")
+@router.delete("/")
 async def destroy_vd(
-    user_id: str,
-    seq: str,
+    delete_user_config:DeleteUser
 ) -> dict:
-    work_dir = os.path.join(os.getcwd(), user_id, seq)
+    user_info = delete_user_config.dict()
+    work_dir = os.path.join(os.getcwd(), user_info["user_id"], user_info["seq"])
     output_message = terraform_destroy(work_dir)
     return {"message": output_message}

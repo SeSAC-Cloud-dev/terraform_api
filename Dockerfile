@@ -24,5 +24,5 @@ RUN wget -O- https://apt.releases.hashicorp.com/gpg | gpg --dearmor -o /usr/shar
 
 RUN python3 -m venv venv && . venv/bin/activate && pip install -r requirements.txt 
 
-CMD ["uvicorn", "main:app", "--host=0.0.0.0"]
+CMD ["/bin/sh", "-c", ". venv/bin/activate && uvicorn main:app --host=0.0.0.0"]
 
