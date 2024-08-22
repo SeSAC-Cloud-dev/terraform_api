@@ -32,11 +32,11 @@ def create_hcl(user_config: dict) -> str:
 
     # EC2 설정 
     resource "aws_instance" "EC2" {{
-        ami = "{user_config["ami_id"]}"
-        instance_type = "{user_config["instance_type"]}"
-        subnet_id = "{user_config["subnet_id"]}"
+        ami = "{user_config['ami_id']}"
+        instance_type = "{user_config['instance_type']}"
+        subnet_id = "{user_config['subnet_id']}"
         tags = {{
-            Name = "{user_config["tag_name"]}"
+            Name = "{user_config['tag_name']}"
         }}
     }}
 
@@ -45,12 +45,12 @@ def create_hcl(user_config: dict) -> str:
     }}
     """
 
-    output_path = os.path.join(os.getcwd(), user_config["user_id"], user_config["seq"])
+    output_path = os.path.join(os.getcwd(), user_config['user_id'], user_config['seq'])
     if not os.path.exists(output_path):
         os.makedirs(output_path)
 
     file_path = os.path.join(
-        output_path, f"{user_config["user_id"]}_{user_config["seq"]}.tf"
+        output_path, f"{user_config['user_id']}_{user_config['seq']}.tf"
     )
     with open(file_path, "w") as file:
         file.write(terraform_config)

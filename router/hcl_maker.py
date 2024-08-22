@@ -1,5 +1,6 @@
 import os
-from fastapi import APIRouter
+import json
+from fastapi import APIRouter, Body
 from function.hcl import create_hcl, terraform_apply, terraform_destroy
 
 router = APIRouter(prefix="/hcl", tags=["hcl"])
