@@ -212,3 +212,6 @@ terraform.rc
 # End of https://www.toptal.com/developers/gitignore/api/terraform,python
 
 config.json
+
+aws
+awscliv2.zip
