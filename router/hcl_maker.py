@@ -9,7 +9,7 @@ router = APIRouter(prefix="/ec2_instance", tags=["EC2"])
 class User(BaseModel):
     user_id: str
     seq: str
-    templete_id: str
+    template_id: str
 
 
 class DeleteUser(BaseModel):

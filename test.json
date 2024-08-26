@@ -1,8 +1,5 @@
 {
     "user_id": "seondo",
     "seq": "1",
-    "ami_id": "ami-062cf18d655c0b1e8",
-    "instance_type": "t2.micro",
-    "subnet_id": "subnet-01d7f9dd7240df654",
-    "tag_name": "EC2-TEST-SEONDO"
+    "template_id": "lt-09c10d50d9f38ae5a"
 }

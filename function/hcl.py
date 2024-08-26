@@ -27,14 +27,13 @@ def create_hcl(user_config: dict) -> str:
     }}
 
     provider "aws" {{
-        profile = "default" 
         region = "ap-northeast-2"
     }}
 
     # EC2 설정 
     resource "aws_instance" "EC2" {{
         launch_template {{
-            id      = "{user_config['templete_id']}"  # 사용하려는 Launch Template ID
+            id      = "{user_config['template_id']}"  # 사용하려는 Launch Template ID
             version = "$Latest"  # 최신 버전 사용, 특정 버전을 사용하려면 버전 번호를 지정
         }}
         tags = {{

@@ -1,0 +1,7 @@
+aws
+awscliv2.zip
+venv
+.git
+.dockerignore
+__pycache__
+Dockerfile
