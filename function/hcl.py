@@ -1,6 +1,7 @@
 import re
 import os
-import subprocess
+import asyncio
+from typing import List
 
 
 def remove_ansi_escape_sequences(text: str) -> str:
@@ -56,23 +57,25 @@ def create_hcl(user_config: dict) -> str:
         file.write(terraform_config)
     return output_path
 
-
-def terraform_apply(output_path: str) -> str:
-    init_process = subprocess.run(
-        ["terraform", f"-chdir={output_path}", "init"], capture_output=True, text=True
+async def run_command(command:List[str]):
+    process = await asyncio.create_subprocess_exec(
+        *command,
+        stdout=asyncio.subprocess.PIPE,
+        stderr=asyncio.subprocess.PIPE
     )
-    if init_process.returncode != 0:
-        raise Exception(f"Terraform init failed: {init_process.stderr}")
+    stdout, stderr = await process.communicate()
+    if process.returncode != 0:
+        raise Exception(f"Command failed: {stderr.decode()}")
+    return stdout.decode()
 
-    apply_process = subprocess.run(
-        ["terraform", f"-chdir={output_path}", "apply", "--auto-approve"],
-        capture_output=True,
-        text=True,
-    )
-    if apply_process.returncode != 0:
-        raise Exception(f"Terraform apply failed: {apply_process.stderr}")
+async def terraform_apply(output_path: str) -> str:
+    init_command = ["terraform", f"-chdir={output_path}", "init"]
+    await run_command(init_command)
 
-    result = remove_ansi_escape_sequences(apply_process.stdout)
+    apply_command = ["terraform", f"-chdir={output_path}", "apply", "--auto-approve"]
+    apply_process = await run_command(apply_command)
+
+    result = remove_ansi_escape_sequences(apply_process)
     
     match = re.search(r'public_ip\\":\\"(.*?)\\"', result)
     
@@ -84,15 +87,8 @@ def terraform_apply(output_path: str) -> str:
     return {"message": result, "public_ip" : public_ip}
 
 
-def terraform_destroy(work_dir: str) -> str:
-    destroy_process = subprocess.run(
-        ["terraform", f"-chdir={work_dir}", "destroy", "--auto-approve"],
-        capture_output=True,
-        text=True,
-    )
-
-    if destroy_process.returncode != 0:
-        raise Exception(f"Terraform apply failed: {destroy_process.stderr}")
-
-    result = remove_ansi_escape_sequences(destroy_process.stdout)
+async def terraform_destroy(work_dir: str) -> str:
+    destroy_command = ["terraform", f"-chdir={work_dir}", "destroy", "--auto-approve"]
+    destroy_process = await run_command(destroy_command)
+    result = remove_ansi_escape_sequences(destroy_process)
     return result
