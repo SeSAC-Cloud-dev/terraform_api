@@ -33,20 +33,21 @@ def create_hcl(user_config: dict) -> str:
 
     # EC2 설정 
     resource "aws_instance" "EC2" {{
-        ami = "{user_config['ami_id']}"
-        instance_type = "{user_config['instance_type']}"
-        subnet_id = "{user_config['subnet_id']}"
+        launch_template {{
+            id      = "{user_config['templete_id']}"  # 사용하려는 Launch Template ID
+            version = "$Latest"  # 최신 버전 사용, 특정 버전을 사용하려면 버전 번호를 지정
+        }}
         tags = {{
-            Name = "{user_config['tag_name']}"
+            Name = "{user_config['user_id']+'_'+user_config['seq']}"
         }}
     }}
 
-    output "instance_public_ip" {{
-        value = jsonencode({{public_ip = aws_instance.EC2.public_ip}})
+    output "instance_private_ip" {{
+        value = jsonencode({{private_ip = aws_instance.EC2.private_ip}})
     }}
     """
 
-    output_path = os.path.join(os.getcwd(), user_config['user_id'], user_config['seq'])
+    output_path = os.path.join(os.getcwd(), user_config["user_id"], user_config["seq"])
     if not os.path.exists(output_path):
         os.makedirs(output_path)
 
@@ -57,16 +58,16 @@ def create_hcl(user_config: dict) -> str:
         file.write(terraform_config)
     return output_path
 
-async def run_command(command:List[str]):
+
+async def run_command(command: List[str]):
     process = await asyncio.create_subprocess_exec(
-        *command,
-        stdout=asyncio.subprocess.PIPE,
-        stderr=asyncio.subprocess.PIPE
+        *command, stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE
     )
     stdout, stderr = await process.communicate()
     if process.returncode != 0:
         raise Exception(f"Command failed: {stderr.decode()}")
     return stdout.decode()
+
 
 async def terraform_apply(output_path: str) -> str:
     init_command = ["terraform", f"-chdir={output_path}", "init"]
@@ -76,15 +77,15 @@ async def terraform_apply(output_path: str) -> str:
     apply_process = await run_command(apply_command)
 
     result = remove_ansi_escape_sequences(apply_process)
-    
-    match = re.search(r'public_ip\\":\\"(.*?)\\"', result)
-    
+
+    match = re.search(r'private_ip\\":\\"(.*?)\\"', result)
+
     if match:
-        public_ip = match.group(1)
+        private_ip = match.group(1)
     else:
         print("Public IP 정보를 찾을 수 없습니다.")
-        
-    return {"message": result, "public_ip" : public_ip}
+
+    return {"message": result, "private_ip": private_ip}
 
 
 async def terraform_destroy(work_dir: str) -> str:

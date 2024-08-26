@@ -5,22 +5,20 @@ from function.hcl import create_hcl, terraform_apply, terraform_destroy
 
 router = APIRouter(prefix="/ec2_instance", tags=["EC2"])
 
+
 class User(BaseModel):
     user_id: str
     seq: str
-    ami_id: str
-    instance_type: str
-    subnet_id: str
-    tag_name: str
-    
+    templete_id: str
+
+
 class DeleteUser(BaseModel):
     user_id: str
     seq: str
-    
+
+
 @router.post("/", status_code=201)
-async def create_ec2_instance(
-    user_config:User
-) -> dict:
+async def create_ec2_instance(user_config: User) -> dict:
     user_config_dict = user_config.dict()
     output_path = create_hcl(user_config_dict)  # hcl 생성
     output_message = await terraform_apply(output_path)
@@ -29,9 +27,7 @@ async def create_ec2_instance(
 
 
 @router.delete("/")
-async def destroy_ec2_instance(
-    delete_user_config:DeleteUser
-) -> dict:
+async def destroy_ec2_instance(delete_user_config: DeleteUser) -> dict:
     user_info = delete_user_config.dict()
     work_dir = os.path.join(os.getcwd(), user_info["user_id"], user_info["seq"])
     output_message = await terraform_destroy(work_dir)
