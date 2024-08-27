@@ -55,7 +55,7 @@ def create_hcl(user_config: dict) -> str:
     }}
     """
 
-    output_path = os.path.join(os.getcwd(), user_config["user_id"], user_config["seq"])
+    output_path = os.path.join(os.getcwd(), "user_tf", user_config["user_id"], user_config["seq"])
     if not os.path.exists(output_path):
         os.makedirs(output_path)
 
