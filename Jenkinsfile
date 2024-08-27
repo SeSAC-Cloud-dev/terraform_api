@@ -33,7 +33,7 @@ pipeline {
         
         stage('Publish Docker Image') {
             steps {
-                withDockerRegistry(credentialsId: 'docker-registry-credentials', url: 'https://index.docker.io/v1/') {
+                withDockerRegistry(credentialsId: 'docker-registry-credential', url: 'https://index.docker.io/v1/') {
                     sh 'docker push highfreshness/terraform-api:${BUILD_NUMBER}'
                     sh 'docker push highfreshness/terraform-api:latest'
                 }
