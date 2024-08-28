@@ -86,9 +86,7 @@ async def terraform_apply(output_path: str) -> str:
     await run_command(init_command)
 
     apply_command = ["terraform", f"-chdir={output_path}", "apply", "--auto-approve"]
-    apply_process = await run_command(apply_command)
-
-    result = remove_ansi_escape_sequences(apply_process)
+    await run_command(apply_command)
     
     # Terraform 결과 추출
     terraform_result_path = os.path.join(output_path, "terraform.tfstate")
@@ -103,7 +101,7 @@ async def terraform_apply(output_path: str) -> str:
     password = literal_eval(pass_data)['PasswordData']
     
     # Guacamole VD 연결 API
-    return {"result" : result, "instance_id" : instance_id, "private_ip" : instance_private_ip, "password_data" : password}
+    return {"instance_id" : instance_id, "private_ip" : instance_private_ip, "password_data" : password}
 
 
 async def terraform_destroy(work_dir: str) -> str:
