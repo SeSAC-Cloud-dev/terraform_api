@@ -4,10 +4,9 @@ import json
 import asyncio
 from typing import List
 from ast import literal_eval
+from function.guacamole import create_guacamole_connection, delete_guacamole_connection
 
-# Secret
-KEY_PATH = "./key.pem"
-    
+
 def remove_ansi_escape_sequences(text: str) -> str:
     # ANSI escape sequences 패턴
     ansi_escape_pattern = re.compile(r"\x1B[@-_][0-?]*[ -/]*[@-~]")
@@ -53,9 +52,15 @@ def create_hcl(user_config: dict) -> str:
     output "instance_private_ip" {{
         value = aws_instance.EC2.private_ip
     }}
+    
+    output "instance_tag_name" {{
+        value = aws_instance.EC2.tags["Name"]
+    }}
     """
 
-    output_path = os.path.join(os.getcwd(), "user_tf", user_config["user_id"], user_config["seq"])
+    output_path = os.path.join(
+        os.getcwd(), "user_tf", user_config["user_id"], user_config["seq"]
+    )
     if not os.path.exists(output_path):
         os.makedirs(output_path)
 
@@ -66,10 +71,20 @@ def create_hcl(user_config: dict) -> str:
         file.write(terraform_config)
     return output_path
 
-async def decrypt_password(instance_id, key_path):
-    decrypt_command = ["aws", "ec2", "get-password-data", "--instance-id", f"{instance_id}", "--priv-launch-key", f"{key_path}"]
+
+async def decrypt_password(instance_id: str, key_path: str = "./key.pem"):
+    decrypt_command = [
+        "aws",
+        "ec2",
+        "get-password-data",
+        "--instance-id",
+        f"{instance_id}",
+        "--priv-launch-key",
+        f"{key_path}",
+    ]
     decrypt_process = await run_command(decrypt_command)
     return decrypt_process
+
 
 async def run_command(command: List[str]):
     process = await asyncio.create_subprocess_exec(
@@ -82,30 +97,49 @@ async def run_command(command: List[str]):
 
 
 async def terraform_apply(output_path: str) -> str:
+    global GUACAMOLE_URL
+    global GUACAMOLE_TOKEN
+    global GUACAMOLE_ID
+    global GUACAMOLE_PW
+    global GUACAMOLE_DATASOURCE
+
     init_command = ["terraform", f"-chdir={output_path}", "init"]
     await run_command(init_command)
 
     apply_command = ["terraform", f"-chdir={output_path}", "apply", "--auto-approve"]
     await run_command(apply_command)
-    
+
     # Terraform 결과 추출
     terraform_result_path = os.path.join(output_path, "terraform.tfstate")
-    with open(terraform_result_path, 'r') as file:
+    with open(terraform_result_path, "r") as file:
         result_data = json.load(file)
-        
-    instance_id = result_data['outputs']['instance_id']['value']
-    instance_private_ip = result_data['outputs']['instance_private_ip']['value']
-    
+
+    instance_id = result_data["outputs"]["instance_id"]["value"]
+    instance_private_ip = result_data["outputs"]["instance_private_ip"]["value"]
+    instance_tag_name = result_data["outputs"]["instance_tag_name"]["value"]
+
     # Password 복호화
-    pass_data = await decrypt_password(instance_id, KEY_PATH)
-    password = literal_eval(pass_data)['PasswordData']
-    
-    # Guacamole VD 연결 API
-    return {"instance_id" : instance_id, "private_ip" : instance_private_ip, "password_data" : password}
+    pass_data = await decrypt_password(instance_id)
+    password = literal_eval(pass_data)["PasswordData"]
+
+    # Guacamole Connection 생성
+    response = await create_guacamole_connection(
+        instance_tag_name,
+        password,
+        instance_private_ip,
+    )
+    return {
+        "instance_id": instance_id,
+        "private_ip": instance_private_ip,
+        "password_data": password,
+        "message": response,
+    }
 
 
-async def terraform_destroy(work_dir: str) -> str:
+async def terraform_destroy(work_dir: str, connection_name: str) -> str:
     destroy_command = ["terraform", f"-chdir={work_dir}", "destroy", "--auto-approve"]
     destroy_process = await run_command(destroy_command)
     result = remove_ansi_escape_sequences(destroy_process)
-    return {"message" : result}
+    # Guacamole 연결 삭제
+    await delete_guacamole_connection(connection_name)
+    return {"message": result}

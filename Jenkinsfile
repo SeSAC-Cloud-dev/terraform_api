@@ -8,13 +8,7 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                git branch: 'main', url: 'https://github.com/SeSAC-Cloud-dev/terraform_api_v2.git'
-            }
-        }
-        
-        stage('Update Dockerfile') {
-            steps {
-                sh 'docker build -t terraform-api:${BUILD_NUMBER} .'
+                git branch: 'main', url: 'https://github.com/SeSAC-Cloud-dev/terraform_api.git'
             }
         }
         
