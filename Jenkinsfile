@@ -26,8 +26,8 @@ pipeline {
         
         stage('Tag Docker Image') {
             steps {
-                sh 'docker tag cloudnexus/daas_backend:latest ${ECR_REPO}:${BUILD_NUMBER}'
-                sh 'docker tag cloudnexus/daas_backend:latest ${ECR_REPO}:latest'
+                sh 'docker tag cloudnexus/daas_backend:${BUILD_NUMBER} ${ECR_REPO}:${BUILD_NUMBER}'
+                sh 'docker tag cloudnexus/daas_backend:${BUILD_NUMBER} ${ECR_REPO}:latest'
             }
         }
         
