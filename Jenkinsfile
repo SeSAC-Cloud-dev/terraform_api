@@ -20,7 +20,7 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 sh 'aws ecr get-login-password --region ap-northeast-2 | docker login --username AWS --password-stdin 214346124741.dkr.ecr.ap-northeast-2.amazonaws.com'
-                sh 'docker build -t cloudnexus/daas_backend .'
+                sh 'docker build -t cloudnexus/daas_backend:${BUILD_NUMBER} .'
             }
         }
         
