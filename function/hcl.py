@@ -141,5 +141,5 @@ async def terraform_destroy(work_dir: str, connection_name: str) -> str:
     destroy_process = await run_command(destroy_command)
     result = remove_ansi_escape_sequences(destroy_process)
     # Guacamole 연결 삭제
-    r = await delete_guacamole_connection(connection_name)
-    return {"EC2_instance_result": result, "Guacamole_result": r}
+    await delete_guacamole_connection(connection_name)
+    return result
