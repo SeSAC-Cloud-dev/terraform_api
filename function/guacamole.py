@@ -1,9 +1,6 @@
 import os
 import httpx
-from dotenv import load_dotenv
 from fastapi import HTTPException
-
-load_dotenv()
 
 GUACAMOLE_URL = os.environ.get("GUACAMOLE_URL")
 GUACAMOLE_ID = os.environ.get("GUACAMOLE_ID")
@@ -65,10 +62,9 @@ async def get_guacamole_token(url: str, id: str, pw: str, datasource: str) -> st
         # 현재 토큰이 None이 아니면 유효 토큰 검증
         params = {"token": GUACAMOLE_TOKEN}
         r = await get_guacamole_connetions(headers, params)
-        if r['message'] == "Permission Denied.":
+        if r.get('message') == "Permission Denied.":
             GUACAMOLE_TOKEN = await generate_token()
             print(f"############ Permission Denied -> Token Generate ############")
-
 
 async def create_guacamole_connection(
     instance_tag: str,
