@@ -142,4 +142,4 @@ async def terraform_destroy(work_dir: str, connection_name: str) -> str:
     result = remove_ansi_escape_sequences(destroy_process)
     # Guacamole 연결 삭제
     await delete_guacamole_connection(connection_name)
-    return {"message": result}
+    return result

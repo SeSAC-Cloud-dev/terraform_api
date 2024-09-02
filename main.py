@@ -2,8 +2,9 @@ import os
 import sys
 import logging
 import datetime
-from fastapi import FastAPI, Request
 from router import hcl
+from fastapi import FastAPI, Request
+from fastapi.middleware.cors import CORSMiddleware
 
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
@@ -14,6 +15,18 @@ logger = logging.getLogger(__name__)
 app = FastAPI()
 app.include_router(hcl.router)
 app.router.redirect_slashes = False
+
+origins = [
+    "*"
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 
 # 미들웨어로 작업 완료 시점 기록
