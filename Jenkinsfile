@@ -39,14 +39,14 @@ pipeline {
         }
     }
 
-    post {
-        always {
-            script {
-                sh 'docker system prune -f'
-                sh 'docker rmi $(docker images -qa) || true'
-            }
-        }
-    }
+    // post {
+    //     always {
+    //         script {
+    //             sh 'docker system prune -f'
+    //             sh 'docker rmi $(docker images -qa) -f || true'
+    //         }
+    //     }
+    // }
 
 }
 
