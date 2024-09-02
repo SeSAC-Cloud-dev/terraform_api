@@ -17,8 +17,8 @@ async def get_guacamole_connections(headers: dict, params: dict):
                 f"{GUACAMOLE_URL}/api/session/data/{GUACAMOLE_DATASOURCE}/connections",
                 headers=headers,
                 params=params,
-            ),
-            if 200 <= response.status_code < 300 and response.content: 
+            )
+            if response.status_code == 200 and response.content: 
                 return response.json()
             else:
                 print("Response content is empty")
