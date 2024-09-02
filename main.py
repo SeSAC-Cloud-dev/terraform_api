@@ -14,7 +14,7 @@ logger = logging.getLogger(__name__)
 
 app = FastAPI()
 app.include_router(hcl.router)
-app.router.redirect_slashes = False
+# app.router.redirect_slashes = False
 
 origins = [
     "*"
