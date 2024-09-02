@@ -101,12 +101,6 @@ async def run_command(command: List[str]):
 
 
 async def terraform_apply(output_path: str) -> str:
-    global GUACAMOLE_URL
-    global GUACAMOLE_TOKEN
-    global GUACAMOLE_ID
-    global GUACAMOLE_PW
-    global GUACAMOLE_DATASOURCE
-
     init_command = ["terraform", f"-chdir={output_path}", "init"]
     await run_command(init_command)
 

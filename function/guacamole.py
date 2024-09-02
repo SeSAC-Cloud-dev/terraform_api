@@ -17,8 +17,7 @@ async def get_guacamole_connections(headers: dict, params: dict):
                 headers=headers,
                 params=params,
             )
-            res = response.raise_for_status()
-            r = res.json()
+            r = response.raise_for_status().json()
             return r
     except httpx.HTTPStatusError as exc:
         print(f"HTTP Status Error: {exc.response.status_code}")
@@ -186,8 +185,7 @@ async def create_guacamole_connection(
                 params=params,
                 json=data,
             )
-            res = response.raise_for_status()
-            r = res.json()
+            r = response.raise_for_status().json()
         return r
     except httpx.HTTPStatusError as exc:
         print(f"HTTP Status Error: {exc.response.status_code}")
@@ -232,8 +230,8 @@ async def delete_guacamole_connection(connection_name: str):
                 headers=headers,
                 params=params,
             )
-            res = response.raise_for_status()
-            r = res.json()
+            r = response.raise_for_status().json()
+            return r
     except httpx.HTTPStatusError as exc:
         print(f"HTTP Status Error: {exc.response.status_code}")
         print(f"Error Message: {exc.response.text}")
