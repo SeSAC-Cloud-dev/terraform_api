@@ -4,6 +4,7 @@ import json
 import asyncio
 from typing import List
 from ast import literal_eval
+from fastapi import HTTPException
 from function.guacamole import create_guacamole_connection, delete_guacamole_connection
 
 
@@ -92,7 +93,10 @@ async def run_command(command: List[str]):
     )
     stdout, stderr = await process.communicate()
     if process.returncode != 0:
-        raise Exception(f"Command failed: {stderr.decode()}")
+        print((f"Command failed: {stderr.decode()}"))
+        raise HTTPException(
+            status_code=409, detail="확인할 수 없는 유저 정보 또는 상태입니다. "
+        )
     return stdout.decode()
 
 

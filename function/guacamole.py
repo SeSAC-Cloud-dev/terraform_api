@@ -36,7 +36,7 @@ async def get_guacamole_token(url: str, id: str, pw: str, datasource: str) -> st
 
     headers = {"Content-Type": "application/json"}
     data = {"username": id, "password": pw}
-    
+
     async def generate_token():
         try:
             async with httpx.AsyncClient() as client:
@@ -63,9 +63,10 @@ async def get_guacamole_token(url: str, id: str, pw: str, datasource: str) -> st
         # 현재 토큰이 None이 아니면 유효 토큰 검증
         params = {"token": GUACAMOLE_TOKEN}
         r = await get_guacamole_connections(headers, params)
-        if r.get('message') == "Permission Denied.":
+        if r.get("message") == "Permission Denied.":
             GUACAMOLE_TOKEN = await generate_token()
             print(f"############ Permission Denied -> Token Generate ############")
+
 
 async def create_guacamole_connection(
     instance_tag: str,
@@ -73,12 +74,6 @@ async def create_guacamole_connection(
     ip: str,
     username: str = "Administrator",
 ):
-    global GUACAMOLE_URL
-    global GUACAMOLE_ID
-    global GUACAMOLE_PW
-    global GUACAMOLE_DATASOURCE
-    global GUACAMOLE_TOKEN
-
     await get_guacamole_token(
         GUACAMOLE_URL, GUACAMOLE_ID, GUACAMOLE_PW, GUACAMOLE_DATASOURCE
     )
@@ -175,7 +170,6 @@ async def create_guacamole_connection(
         },
     }
 
-    # Guacamole Connection 존재 여부 확인
     r = await get_guacamole_connections(headers, params)
 
     for _, value in r.items():
@@ -184,7 +178,6 @@ async def create_guacamole_connection(
                 status_code=409, detail="같은 이름의 연결이 이미 존재합니다."
             )
 
-    # Guacamole Connection 생성
     try:
         async with httpx.AsyncClient() as client:
             response = await client.post(
@@ -208,12 +201,6 @@ async def create_guacamole_connection(
 
 
 async def delete_guacamole_connection(connection_name: str):
-    global GUACAMOLE_URL
-    global GUACAMOLE_ID
-    global GUACAMOLE_PW
-    global GUACAMOLE_DATASOURCE
-    global GUACAMOLE_TOKEN
-
     # Token 유효성 체크 및 생성
     await get_guacamole_token(
         GUACAMOLE_URL, GUACAMOLE_ID, GUACAMOLE_PW, GUACAMOLE_DATASOURCE
@@ -230,7 +217,9 @@ async def delete_guacamole_connection(connection_name: str):
             if value.get("name") == connection_name:
                 connection_num = key
     except AttributeError:
-        raise HTTPException(status_code=409, detail="TOKEN 발행을 위한 ID / PW를 확인하세요.")
+        raise HTTPException(
+            status_code=409, detail="TOKEN 발행을 위한 ID / PW를 확인하세요."
+        )
 
     if connection_num is None:
         raise HTTPException(status_code=409, detail="존재하지 않는 Connection입니다.")
