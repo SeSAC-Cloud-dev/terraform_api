@@ -104,7 +104,7 @@ async def terraform_apply(output_path: str) -> str:
     init_command = ["terraform", f"-chdir={output_path}", "init"]
     await run_command(init_command)
 
-    apply_command = ["terraform", f"-chdir={output_path}", "apply", "--auto-approve"]
+    apply_command = ["terraform", f"-chdir={output_path}", "apply", "--auto-approve", "-lock=false"]
     await run_command(apply_command)
 
     # Terraform 결과 추출
@@ -135,7 +135,7 @@ async def terraform_apply(output_path: str) -> str:
 
 
 async def terraform_destroy(work_dir: str, connection_name: str) -> str:
-    destroy_command = ["terraform", f"-chdir={work_dir}", "destroy", "--auto-approve"]
+    destroy_command = ["terraform", f"-chdir={work_dir}", "destroy", "--auto-approve", "-lock=false"]
     destroy_process = await run_command(destroy_command)
     result = remove_ansi_escape_sequences(destroy_process)
     # Guacamole 연결 삭제

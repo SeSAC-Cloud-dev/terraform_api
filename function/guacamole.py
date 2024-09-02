@@ -230,8 +230,12 @@ async def delete_guacamole_connection(connection_name: str):
                 headers=headers,
                 params=params,
             )
-            r = response.raise_for_status().json()
-            return r
+            if response.status_code == 200:
+                r = response.raise_for_status().json()
+                return r
+            else:
+                raise HTTPException(status_code=500, detail="연결 삭제를 진행할 수 없습니다.")
+                
     except httpx.HTTPStatusError as exc:
         print(f"HTTP Status Error: {exc.response.status_code}")
         print(f"Error Message: {exc.response.text}")
