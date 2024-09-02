@@ -1,6 +1,7 @@
 import os
 import httpx
 from fastapi import HTTPException
+from fastapi.responses import JSONResponse
 
 GUACAMOLE_URL = os.environ.get("GUACAMOLE_URL")
 GUACAMOLE_ID = os.environ.get("GUACAMOLE_ID")
@@ -16,9 +17,12 @@ async def get_guacamole_connections(headers: dict, params: dict):
                 f"{GUACAMOLE_URL}/api/session/data/{GUACAMOLE_DATASOURCE}/connections",
                 headers=headers,
                 params=params,
-            )
-            r = response.raise_for_status().json()
-            return r
+            ),
+            if 200 <= response.status_code < 300 and response.content: 
+                return response.json()
+            else:
+                print("Response content is empty")
+                raise HTTPException(status_code=500, detail="Guacamole 연결 테스트에 실패했습니다.")
     except httpx.HTTPStatusError as exc:
         print(f"HTTP Status Error: {exc.response.status_code}")
         print(f"Error Message: {exc.response.text}")
@@ -40,9 +44,13 @@ async def get_guacamole_token(url: str, id: str, pw: str, datasource: str) -> st
         try:
             async with httpx.AsyncClient() as client:
                 response = await client.post(f"{url}/api/tokens", data=data)
-                r = response.raise_for_status().json()
-                token = r.get("authToken")
-                return token
+                if 200 <= response.status_code < 300 and response.content: 
+                    r = response.json()
+                    return r.get("authToken")
+                else:
+                    print("Guacamole token response content is empty")
+                    raise HTTPException(status_code=500, detail="Guacamole 토큰 생성에 실패했습니다.")
+
         except httpx.HTTPStatusError as exc:
             print(f"HTTP Status Error: {exc.response.status_code}")
             print(f"Error Message: {exc.response.text}")
@@ -185,8 +193,10 @@ async def create_guacamole_connection(
                 params=params,
                 json=data,
             )
-            res = response.raise_for_status()
-            print(f"Response : {res.json()}")
+            if response.status_code == 200:
+                return JSONResponse(content={"message": "연결 생성에 성공했습니다."}, status_code=200)
+            else:
+                raise HTTPException(status_code=500, detail="연결 생성에 실패했습니다.")
             
     except httpx.HTTPStatusError as exc:
         print(f"HTTP Status Error: {exc.response.status_code}")
@@ -231,8 +241,14 @@ async def delete_guacamole_connection(connection_name: str):
                 headers=headers,
                 params=params,
             )
-            res = response.raise_for_status()
-            print(f"Response : {res.json()}")
+            if response.status_code == 204:
+                return JSONResponse(content={"message": "연결 삭제에 성공했습니다."}, status_code=204)
+            else:
+                if response.content: 
+                    print(f"Response : {response.json()}")
+                else:
+                    print("Response content is empty")
+                raise HTTPException(status_code=500, detail="연결 삭제에 실패했습니다.")
 
     except httpx.HTTPStatusError as exc:
         print(f"HTTP Status Error: {exc.response.status_code}")
