@@ -4,6 +4,7 @@ import json
 import asyncio
 from typing import List
 from ast import literal_eval
+from fastapi import HTTPException
 from function.guacamole import create_guacamole_connection, delete_guacamole_connection
 
 
@@ -92,21 +93,18 @@ async def run_command(command: List[str]):
     )
     stdout, stderr = await process.communicate()
     if process.returncode != 0:
-        raise Exception(f"Command failed: {stderr.decode()}")
+        print((f"Command failed: {stderr.decode()}"))
+        raise HTTPException(
+            status_code=409, detail="확인할 수 없는 유저 정보 또는 상태입니다. "
+        )
     return stdout.decode()
 
 
 async def terraform_apply(output_path: str) -> str:
-    global GUACAMOLE_URL
-    global GUACAMOLE_TOKEN
-    global GUACAMOLE_ID
-    global GUACAMOLE_PW
-    global GUACAMOLE_DATASOURCE
-
     init_command = ["terraform", f"-chdir={output_path}", "init"]
     await run_command(init_command)
 
-    apply_command = ["terraform", f"-chdir={output_path}", "apply", "--auto-approve"]
+    apply_command = ["terraform", f"-chdir={output_path}", "apply", "--auto-approve", "-lock=false"]
     await run_command(apply_command)
 
     # Terraform 결과 추출
@@ -123,7 +121,7 @@ async def terraform_apply(output_path: str) -> str:
     password = literal_eval(pass_data)["PasswordData"]
 
     # Guacamole Connection 생성
-    response = await create_guacamole_connection(
+    await create_guacamole_connection(
         instance_tag_name,
         password,
         instance_private_ip,
@@ -131,13 +129,12 @@ async def terraform_apply(output_path: str) -> str:
     return {
         "instance_id": instance_id,
         "private_ip": instance_private_ip,
-        "password_data": password,
-        "message": response,
+        "password_data": password
     }
 
 
 async def terraform_destroy(work_dir: str, connection_name: str) -> str:
-    destroy_command = ["terraform", f"-chdir={work_dir}", "destroy", "--auto-approve"]
+    destroy_command = ["terraform", f"-chdir={work_dir}", "destroy", "--auto-approve", "-lock=false"]
     destroy_process = await run_command(destroy_command)
     result = remove_ansi_escape_sequences(destroy_process)
     # Guacamole 연결 삭제
