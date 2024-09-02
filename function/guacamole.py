@@ -194,7 +194,7 @@ async def create_guacamole_connection(
                 json=data,
             )
             if response.status_code == 200:
-                return JSONResponse(content={"message": "연결 생성에 성공했습니다."}, status_code=200)
+                print(f"연결 생성 성공 : {response.json()}")
             else:
                 raise HTTPException(status_code=500, detail="연결 생성에 실패했습니다.")
             
