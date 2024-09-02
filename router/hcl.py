@@ -24,7 +24,6 @@ async def create_ec2_instance(user_config: User) -> dict:
     output_message = await terraform_apply(output_path)
     return {"message": output_message}
 
-
 @router.delete("/")
 async def destroy_ec2_instance(delete_user_config: DeleteUser) -> dict:
     user_info = delete_user_config.model_dump()

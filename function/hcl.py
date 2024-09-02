@@ -121,7 +121,7 @@ async def terraform_apply(output_path: str) -> str:
     password = literal_eval(pass_data)["PasswordData"]
 
     # Guacamole Connection 생성
-    response = await create_guacamole_connection(
+    await create_guacamole_connection(
         instance_tag_name,
         password,
         instance_private_ip,
@@ -129,8 +129,7 @@ async def terraform_apply(output_path: str) -> str:
     return {
         "instance_id": instance_id,
         "private_ip": instance_private_ip,
-        "password_data": password,
-        "message": response,
+        "password_data": password
     }
 
 
