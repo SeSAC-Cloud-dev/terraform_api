@@ -39,14 +39,17 @@ pipeline {
         }
     }
 
-    // post {
-    //     always {
-    //         script {
-    //             sh 'docker system prune -f'
-    //             sh 'docker rmi $(docker images -qa) -f || true'
-    //         }
-    //     }
-    // }
+    post {
+        always {
+            script {
+                //sh 'docker system prune -f'
+                //sh 'docker rmi $(docker images -q --filter "dangling=true")
+                  sh 'docker rmi ${ECR_REPO}:${BUILD_NUMBER}'
+                  sh 'docker rmi ${ECR_REPO}:latest'
+                  sh 'docker rmi cloudnexus/daas_backend:${BUILD_NUMBER}'
+            }
+        }
+    }
 
 }
 
