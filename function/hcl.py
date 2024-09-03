@@ -126,13 +126,14 @@ async def terraform_apply(output_path: str) -> str:
         password,
         instance_private_ip,
     )
-    return result_data
+    # return result_data
 
 
 async def terraform_destroy(work_dir: str, connection_name: str) -> str:
     destroy_command = ["terraform", f"-chdir={work_dir}", "destroy", "--auto-approve"]
-    destroy_process = await run_command(destroy_command)
-    result = remove_ansi_escape_sequences(destroy_process)
+    await run_command(destroy_command)
+    # destroy_process = await run_command(destroy_command)
+    # result = remove_ansi_escape_sequences(destroy_process)
     # Guacamole 연결 삭제
     await delete_guacamole_connection(connection_name)
-    return result
+    # return result

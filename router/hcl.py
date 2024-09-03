@@ -22,8 +22,8 @@ class DeleteUser(BaseModel):
 async def create_ec2_instance(user_config: User):
     user_config_dict = user_config.model_dump()
     output_path = create_hcl(user_config_dict)
-    output_message = await terraform_apply(output_path)
-    return JSONResponse(content={"message": output_message}, status_code=200)
+    await terraform_apply(output_path)
+    return JSONResponse(content={"message": "EC2 인스턴스와 Guacamole 연결이 생성되었습니다."}, status_code=200)
 
 
 @router.delete("/")
@@ -33,6 +33,6 @@ async def destroy_ec2_instance(delete_user_config: DeleteUser):
         os.getcwd(), "user_tf", user_info["user_id"], user_info["seq"]
     )
     connection_name = f"{user_info['user_id']}_{user_info['seq']}"
-    output_message = await terraform_destroy(work_dir, connection_name)
-    return JSONResponse(content={"message": output_message}, status_code=204)
+    await terraform_destroy(work_dir, connection_name)
+    return JSONResponse(content={"message": "EC2 인스턴스와 Guacamole 연결이 삭제되었습니다."}, status_code=204)
 
