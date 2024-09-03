@@ -173,7 +173,7 @@ async def create_guacamole_connection(
             json=data,
         )
         if response.status_code == 200:
-             return JSONResponse(content={"message": "연결 생성에 성공했습니다."}, status_code=204)
+             return "연결 생성에 성공했습니다."
         else:
             raise HTTPException(status_code=500, detail="연결 생성에 실패했습니다.")
 
@@ -207,7 +207,7 @@ async def delete_guacamole_connection(connection_name: str):
             params=params,
         )
         if response.status_code == 204:
-            return JSONResponse(content={"message": "연결 삭제에 성공했습니다."}, status_code=204)
+            return "연결 삭제에 성공했습니다."
         else:
             if response.content: 
                 print(f"Response : {response.json()}")
