@@ -126,11 +126,7 @@ async def terraform_apply(output_path: str) -> str:
         password,
         instance_private_ip,
     )
-    return {
-        "instance_id": instance_id,
-        "private_ip": instance_private_ip,
-        "password_data": password
-    }
+    return result_data
 
 
 async def terraform_destroy(work_dir: str, connection_name: str) -> str:

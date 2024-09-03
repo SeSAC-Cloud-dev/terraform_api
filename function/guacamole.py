@@ -24,14 +24,13 @@ async def get_guacamole_connections(headers: dict, params: dict):
             raise HTTPException(status_code=500, detail="Guacamole 연결 테스트에 실패했습니다.")
 
 
-async def get_guacamole_token(url: str, id: str, pw: str, datasource: str) -> str:
+async def get_guacamole_token(url: str, id: str, pw: str) -> str:
     global GUACAMOLE_TOKEN
 
     headers = {"Content-Type": "application/json"}
     data = {"username": id, "password": pw}
 
     async def generate_token():
-
         async with httpx.AsyncClient() as client:
             response = await client.post(f"{url}/api/tokens", data=data)
             if 200 <= response.status_code < 300 and response.content: 
@@ -63,7 +62,7 @@ async def create_guacamole_connection(
     username: str = "Administrator",
 ):
     await get_guacamole_token(
-        GUACAMOLE_URL, GUACAMOLE_ID, GUACAMOLE_PW, GUACAMOLE_DATASOURCE
+        GUACAMOLE_URL, GUACAMOLE_ID, GUACAMOLE_PW
     )
 
     headers = {"Content-Type": "application/json"}
@@ -182,7 +181,7 @@ async def create_guacamole_connection(
 async def delete_guacamole_connection(connection_name: str):
     # Token 유효성 체크 및 생성
     await get_guacamole_token(
-        GUACAMOLE_URL, GUACAMOLE_ID, GUACAMOLE_PW, GUACAMOLE_DATASOURCE
+        GUACAMOLE_URL, GUACAMOLE_ID, GUACAMOLE_PW
     )
     headers = {"Content-Type": "application/json"}
     params = {"token": GUACAMOLE_TOKEN}
