@@ -17,11 +17,13 @@ async def get_guacamole_connections(headers: dict, params: dict):
             headers=headers,
             params=params,
         )
-        if response.status_code == 200 and response.content: 
+        if response.status_code == 200 and response.content:
             return response.json()
         else:
             print("Response content is empty")
-            raise HTTPException(status_code=500, detail="Guacamole 연결 테스트에 실패했습니다.")
+            raise HTTPException(
+                status_code=500, detail="Guacamole 연결 테스트에 실패했습니다."
+            )
 
 
 async def get_guacamole_token(url: str, id: str, pw: str) -> str:
@@ -33,13 +35,14 @@ async def get_guacamole_token(url: str, id: str, pw: str) -> str:
     async def generate_token():
         async with httpx.AsyncClient() as client:
             response = await client.post(f"{url}/api/tokens", data=data)
-            if 200 <= response.status_code < 300 and response.content: 
+            if 200 <= response.status_code < 300 and response.content:
                 r = response.json()
                 return r.get("authToken")
             else:
                 print("Guacamole token response content is empty")
-                raise HTTPException(status_code=500, detail="Guacamole 토큰 생성에 실패했습니다.")
-
+                raise HTTPException(
+                    status_code=500, detail="Guacamole 토큰 생성에 실패했습니다."
+                )
 
     # Token 미발급 상태라면 Generate
     if GUACAMOLE_TOKEN is None:
@@ -61,9 +64,7 @@ async def create_guacamole_connection(
     ip: str,
     username: str = "Administrator",
 ):
-    await get_guacamole_token(
-        GUACAMOLE_URL, GUACAMOLE_ID, GUACAMOLE_PW
-    )
+    await get_guacamole_token(GUACAMOLE_URL, GUACAMOLE_ID, GUACAMOLE_PW)
 
     headers = {"Content-Type": "application/json"}
     params = {"token": GUACAMOLE_TOKEN}
@@ -173,16 +174,14 @@ async def create_guacamole_connection(
             json=data,
         )
         if response.status_code == 200:
-             return "연결 생성에 성공했습니다."
+            return "연결 생성에 성공했습니다."
         else:
             raise HTTPException(status_code=500, detail="연결 생성에 실패했습니다.")
 
 
 async def delete_guacamole_connection(connection_name: str):
     # Token 유효성 체크 및 생성
-    await get_guacamole_token(
-        GUACAMOLE_URL, GUACAMOLE_ID, GUACAMOLE_PW
-    )
+    await get_guacamole_token(GUACAMOLE_URL, GUACAMOLE_ID, GUACAMOLE_PW)
     headers = {"Content-Type": "application/json"}
     params = {"token": GUACAMOLE_TOKEN}
 
@@ -209,7 +208,7 @@ async def delete_guacamole_connection(connection_name: str):
         if response.status_code == 204:
             return "연결 삭제에 성공했습니다."
         else:
-            if response.content: 
+            if response.content:
                 print(f"Response : {response.json()}")
             else:
                 print("Response content is empty")

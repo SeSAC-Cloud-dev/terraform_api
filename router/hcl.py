@@ -23,7 +23,7 @@ async def create_ec2_instance(user_config: User):
     user_config_dict = user_config.model_dump()
     output_path = create_hcl(user_config_dict)
     result = await terraform_apply(output_path)
-    return JSONResponse(content={"message":result}, status_code=200)
+    return JSONResponse(content={"message": result}, status_code=200)
 
 
 @router.delete("/")
@@ -35,4 +35,3 @@ async def destroy_ec2_instance(delete_user_config: DeleteUser):
     connection_name = f"{user_info['user_id']}_{user_info['seq']}"
     result = await terraform_destroy(work_dir, connection_name)
     return JSONResponse(content={"message": result}, status_code=204)
-
