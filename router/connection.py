@@ -2,9 +2,9 @@ import os
 from pydantic import BaseModel
 from fastapi import APIRouter
 from fastapi.responses import JSONResponse
-from function.hcl import create_hcl, terraform_apply, terraform_destroy
+from function.connection import create_hcl, terraform_apply, terraform_destroy
 
-router = APIRouter(prefix="/ec2_instance", tags=["EC2"])
+router = APIRouter(prefix="/connection", tags=["Connection"])
 
 
 class User(BaseModel):
@@ -19,7 +19,7 @@ class DeleteUser(BaseModel):
 
 
 @router.post("/")
-async def create_ec2_instance(user_config: User):
+async def create_connection(user_config: User):
     user_config_dict = user_config.model_dump()
     output_path = create_hcl(user_config_dict)
     result = await terraform_apply(output_path)
@@ -27,7 +27,7 @@ async def create_ec2_instance(user_config: User):
 
 
 @router.delete("/")
-async def destroy_ec2_instance(delete_user_config: DeleteUser):
+async def destroy_connection(delete_user_config: DeleteUser):
     user_info = delete_user_config.model_dump()
     work_dir = os.path.join(
         os.getcwd(), "user_tf", user_info["user_id"], user_info["seq"]

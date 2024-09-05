@@ -2,7 +2,7 @@ import os
 import sys
 import logging
 import datetime
-from router import hcl
+from router import connection
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -13,7 +13,7 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 app = FastAPI()
-app.include_router(hcl.router)
+app.include_router(connection.router)
 app.router.redirect_slashes = False
 
 origins = ["*"]
