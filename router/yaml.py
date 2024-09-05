@@ -9,4 +9,4 @@ router = APIRouter(prefix="/yaml", tags=["Version control"])
 @router.put("/")
 async def update_yaml(tag_name: str):
     result = update_yaml(tag_name)
-    return JSONResponse(content={"message": result}, status_code=200)
+    return JSONResponse(content=result, status_code=200)
