@@ -33,5 +33,5 @@ async def destroy_connection(delete_user_config: DeleteUser):
         os.getcwd(), "user_tf", user_info["user_id"], user_info["seq"]
     )
     connection_name = f"{user_info['user_id']}_{user_info['seq']}"
-    result = await terraform_destroy(work_dir, connection_name)
-    return JSONResponse(content={"message": result}, status_code=204)
+    await terraform_destroy(work_dir, connection_name)
+    return JSONResponse(status_code=204)

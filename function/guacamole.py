@@ -205,9 +205,7 @@ async def delete_guacamole_connection(connection_name: str):
             headers=headers,
             params=params,
         )
-        if response.status_code == 204:
-            return "연결 삭제에 성공했습니다."
-        else:
+        if response.status_code != 204:
             if response.content:
                 print(f"Response : {response.json()}")
             else:
