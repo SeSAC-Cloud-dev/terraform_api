@@ -7,7 +7,7 @@ router = APIRouter(prefix="/yaml", tags=["Version control"])
 
 GITHUB_ACCESS_TOKEN = os.getenv("GITHUB_ACCESS_TOKEN")
 REPO_NAME = "SeSAC-Cloud-dev/k8s"
-FILE_PATH = "/mattermost/mattermost-deployment.yaml"
+FILE_PATH = "mattermost/mattermost/mattermost-deployment.yaml"
 BRANCH_NAME = "main"
 
 
@@ -21,14 +21,19 @@ async def update_yaml(new_value: str):
         # 파일 내용 가져오기
         file = repo.get_contents(FILE_PATH, ref=BRANCH_NAME)
         content = file.decoded_content.decode()
+        print(f"content : {content}")
         print(f"Before File SHA: {file.sha}")
         yaml_content = yaml.safe_load(content)
+        print(f"yaml_content : {yaml_content}")
         yaml_content["spec"]["template"]["spec"]["containers"][0][
             "image"
         ] = f"214346124741.dkr.ecr.ap-northeast-2.amazonaws.com/cloudnexus/mattermost:{new_value}"
         updated_content = yaml.safe_dump(
             yaml_content, indent=2, sort_keys=False, default_flow_style=False
         )
+        
+        print(f"updated_content : {updated_content}")
+
 
         # 변경사항 커밋
         repo.update_file(
