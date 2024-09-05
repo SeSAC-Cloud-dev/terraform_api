@@ -38,6 +38,9 @@ async def log_completion_time(request: Request, call_next):
     )
     return response
 
+@app.get("/")
+async def root():
+    return {"message" : "Hello CloudNexus!"}
 
 @app.get("/ping")
 async def ping():
