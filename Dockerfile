@@ -6,7 +6,7 @@ WORKDIR /app
 
 RUN apt update
 
-RUN apt install -y curl unzip gpg wget lsb-release python3-pip python3-venv vim
+RUN apt install -y curl unzip gpg wget lsb-release python3-venv vim
 
 # AWS CLI 설치
 RUN curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip" && \
