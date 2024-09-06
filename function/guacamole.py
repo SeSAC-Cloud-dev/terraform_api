@@ -16,6 +16,7 @@ async def get_guacamole_connections(headers: dict, params: dict):
             f"{GUACAMOLE_URL}/api/session/data/{GUACAMOLE_DATASOURCE}/connections",
             headers=headers,
             params=params,
+            verify=False
         )
         if response.status_code == 200 and response.content:
             return response.json()
@@ -34,7 +35,7 @@ async def get_guacamole_token(url: str, id: str, pw: str) -> str:
 
     async def generate_token():
         async with httpx.AsyncClient() as client:
-            response = await client.post(f"{url}/api/tokens", data=data)
+            response = await client.post(f"{url}/api/tokens", data=data, verify=False)
             if 200 <= response.status_code < 300 and response.content:
                 r = response.json()
                 return r.get("authToken")
@@ -172,6 +173,7 @@ async def create_guacamole_connection(
             headers=headers,
             params=params,
             json=data,
+            verify=False
         )
         if response.status_code == 200:
             return "연결 생성에 성공했습니다."
@@ -204,6 +206,7 @@ async def delete_guacamole_connection(connection_name: str):
             f"{GUACAMOLE_URL}/api/session/data/{GUACAMOLE_DATASOURCE}/connections/{connection_num}",
             headers=headers,
             params=params,
+            verify=False
         )
         if response.status_code != 204:
             if response.content:
