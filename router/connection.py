@@ -1,6 +1,6 @@
 import os
 from pydantic import BaseModel
-from fastapi import APIRouter
+from fastapi import APIRouter, Response
 from fastapi.responses import JSONResponse
 from function.connection import create_hcl, terraform_apply, terraform_destroy
 
@@ -34,4 +34,4 @@ async def destroy_connection(delete_user_config: DeleteUser):
     )
     connection_name = f"{user_info['user_id']}_{user_info['seq']}"
     await terraform_destroy(work_dir, connection_name)
-    return JSONResponse(status_code=204)
+    return Response(status_code=204)
