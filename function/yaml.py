@@ -18,7 +18,7 @@ async def update_yaml(tag_name):
         # 파일 내용 가져오기
         file = repo.get_contents(FILE_PATH, ref=BRANCH_NAME)
         content = file.decoded_content.decode()
-
+        
         yaml_content = yaml.safe_load(content)
         yaml_content["spec"]["template"]["spec"]["containers"][0][
             "image"
