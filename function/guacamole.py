@@ -11,12 +11,11 @@ GUACAMOLE_TOKEN = None
 
 
 async def get_guacamole_connections(headers: dict, params: dict):
-    async with httpx.AsyncClient() as client:
+    async with httpx.AsyncClient(verify=False) as client:
         response = await client.get(
             f"{GUACAMOLE_URL}/api/session/data/{GUACAMOLE_DATASOURCE}/connections",
             headers=headers,
-            params=params,
-            verify=False
+            params=params
         )
         if response.status_code == 200 and response.content:
             return response.json()
@@ -34,8 +33,8 @@ async def get_guacamole_token(url: str, id: str, pw: str) -> str:
     data = {"username": id, "password": pw}
 
     async def generate_token():
-        async with httpx.AsyncClient() as client:
-            response = await client.post(f"{url}/api/tokens", data=data, verify=False)
+        async with httpx.AsyncClient(verify=False) as client:
+            response = await client.post(f"{url}/api/tokens", data=data)
             if 200 <= response.status_code < 300 and response.content:
                 r = response.json()
                 return r.get("authToken")
@@ -167,13 +166,12 @@ async def create_guacamole_connection(
                 status_code=409, detail="같은 이름의 연결이 이미 존재합니다."
             )
 
-    async with httpx.AsyncClient() as client:
+    async with httpx.AsyncClient(verify=False) as client:
         response = await client.post(
             f"{GUACAMOLE_URL}/api/session/data/{GUACAMOLE_DATASOURCE}/connections",
             headers=headers,
             params=params,
-            json=data,
-            verify=False
+            json=data
         )
         if response.status_code == 200:
             return "연결 생성에 성공했습니다."
@@ -201,12 +199,11 @@ async def delete_guacamole_connection(connection_name: str):
 
     # Connection_num을 이용해 Connection 삭제
 
-    async with httpx.AsyncClient() as client:
+    async with httpx.AsyncClient(verify=False) as client:
         response = await client.delete(
             f"{GUACAMOLE_URL}/api/session/data/{GUACAMOLE_DATASOURCE}/connections/{connection_num}",
             headers=headers,
-            params=params,
-            verify=False
+            params=params
         )
         if response.status_code != 204:
             if response.content:
