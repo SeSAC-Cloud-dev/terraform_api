@@ -37,8 +37,8 @@ def create_hcl(user_config: dict) -> str:
     # EC2 설정 
     resource "aws_instance" "EC2" {{
         launch_template {{
-            id      = "{user_config['template_id']}"  # 사용하려는 Launch Template ID
-            version = "$Latest"  # 최신 버전 사용, 특정 버전을 사용하려면 버전 번호를 지정
+            id      = "{user_config['template_id']}" 
+            version = "$Latest"  
         }}
         tags = {{
             Name = "{user_config['user_id']+'_'+user_config['seq']}"
@@ -131,7 +131,6 @@ async def terraform_apply(output_path: str) -> str:
 
 async def terraform_destroy(work_dir: str, connection_name: str) -> str:
     destroy_command = ["terraform", f"-chdir={work_dir}", "destroy", "--auto-approve"]
-    await run_command(destroy_command)
     destroy_process = await run_command(destroy_command)
     result = remove_ansi_escape_sequences(destroy_process)
     # Guacamole 연결 삭제

@@ -9,7 +9,7 @@ FILE_PATH = "mattermost/mattermost/mattermost-deployment.yaml"
 BRANCH_NAME = "main"
 
 
-async def update_yaml(tag_name):
+def update_yaml(tag_name):
     try:
         # GitHub 인스턴스 생성
         g = Github(GITHUB_ACCESS_TOKEN)
