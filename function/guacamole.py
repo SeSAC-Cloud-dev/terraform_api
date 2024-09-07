@@ -159,7 +159,6 @@ async def create_guacamole_connection(
     }
 
     r = await get_guacamole_connections(headers, params)
-    # No CORS
     for _, value in r.items():
         if value.get("name") == instance_tag:
             raise HTTPException(

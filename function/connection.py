@@ -88,16 +88,22 @@ async def decrypt_password(instance_id: str, key_path: str = "./key.pem"):
 
 
 async def run_command(command: List[str]):
-    process = await asyncio.create_subprocess_exec(
-        *command, stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE
-    )
-    stdout, stderr = await process.communicate()
-    if process.returncode != 0:
-        print((f"Command failed: {stderr.decode()}"))
-        raise HTTPException(
-            status_code=409, detail="확인할 수 없는 유저 정보 또는 상태입니다. "
+    try:
+        process = await asyncio.create_subprocess_exec(
+            *command, stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE
         )
-    return stdout.decode()
+        stdout, stderr = await process.communicate()
+        if process.returncode != 0:
+            print((f"Command failed: {stderr.decode()}"))
+            raise HTTPException(
+                status_code=409, detail="확인할 수 없는 유저 정보 또는 상태입니다. "
+            )
+        return stdout.decode()
+    except Exception as e:
+        print(f"An error occurred: {str(e)}")
+        raise HTTPException(
+            status_code=500, detail="Internal server error"
+        )
 
 
 async def terraform_apply(output_path: str) -> str:
