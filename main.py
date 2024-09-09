@@ -2,7 +2,7 @@ import os
 import sys
 import logging
 import datetime
-from router import app, connection
+from router import connection, version_control
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -14,7 +14,7 @@ logger = logging.getLogger(__name__)
 
 app = FastAPI()
 app.include_router(connection.router)
-app.include_router(app.router)
+app.include_router(version_control.router)
 app.router.redirect_slashes = False
 
 origins = ["*"]
