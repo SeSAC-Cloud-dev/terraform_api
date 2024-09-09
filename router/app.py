@@ -2,10 +2,10 @@ from fastapi import APIRouter
 from function.yaml import update_yaml
 
 
-router = APIRouter(prefix="/yaml", tags=["Version control"])
+router = APIRouter(prefix="/app", tags=["Version control"])
 
 
-@router.put("/")
+@router.put("/version")
 async def yaml_result(tag_name: str):
     result = update_yaml(tag_name)
     return {"message": result}
