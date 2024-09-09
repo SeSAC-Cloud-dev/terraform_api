@@ -1,5 +1,5 @@
 from fastapi import APIRouter
-from function.yaml import update_yaml
+from function.version_control import update_yaml
 
 
 router = APIRouter(prefix="/app", tags=["Version control"])
